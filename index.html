@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健身房器材使用指南</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            color: #8892b0;
+            font-size: 16px;
+        }
+        
+        /* 部位选择 */
+        .section-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #ccd6f6;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 2px;
+        }
+        
+        .body-parts {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        
+        .part-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .part-btn:hover {
+            border-color: #f093fb;
+            background: rgba(240, 147, 251, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .part-btn.active {
+            border-color: #f5576c;
+            background: rgba(245, 87, 108, 0.2);
+        }
+        
+        .part-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        
+        .part-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        /* 器材和动作展示 */
+        .exercises-section {
+            display: none;
+        }
+        
+        .exercises-section.show {
+            display: block;
+        }
+        
+        .exercises-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .exercise-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        
+        .exercise-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .exercise-gif {
+            width: 100%;
+            height: 300px;
+            background: #0a0a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .exercise-gif img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .exercise-gif .placeholder {
+            color: #8892b0;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .exercise-gif .placeholder .icon {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+        
+        .exercise-info {
+            padding: 20px;
+        }
+        
+        .exercise-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #ccd6f6;
+        }
+        
+        .exercise-equipment {
+            display: inline-block;
+            background: rgba(240, 147, 251, 0.2);
+            color: #f093fb;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+        
+        .exercise-details {
+            margin-top: 15px;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+        }
+        
+        .detail-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .detail-content h4 {
+            font-size: 14px;
+            color: #f093fb;
+            margin-bottom: 5px;
+        }
+        
+        .detail-content p {
+            font-size: 14px;
+            color: #a8b2d1;
+            line-height: 1.6;
+        }
+        
+        .tips-list {
+            list-style: none;
+            margin-top: 10px;
+        }
+        
+        .tips-list li {
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+            color: #a8b2d1;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .tips-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #64ffda;
+        }
+        
+        /* 加载动画 */
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #8892b0;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #f093fb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 28px;
+            }
+            
+            .body-parts {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .exercises-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💪 健身房器材使用指南</h1>
+            <p class="subtitle">选择锻炼部位，查看标准动作演示</p>
+        </header>
+        
+        <!-- 部位选择 -->
+        <div class="section-title">选择锻炼部位</div>
+        <div class="body-parts">
+            <div class="part-btn" data-part="chest">
+                <div class="part-icon">🏋️</div>
+                <div class="part-name">胸部</div>
+            </div>
+            <div class="part-btn" data-part="back">
+                <div class="part-icon">💪</div>
+                <div class="part-name">背部</div>
+            </div>
+            <div class="part-btn" data-part="legs">
+                <div class="part-icon">🦵</div>
+                <div class="part-name">腿部</div>
+            </div>
+            <div class="part-btn" data-part="shoulders">
+                <div class="part-icon">🤸</div>
+                <div class="part-name">肩部</div>
+            </div>
+            <div class="part-btn" data-part="arms">
+                <div class="part-icon">💪</div>
+                <div class="part-name">手臂</div>
+            </div>
+            <div class="part-btn" data-part="core">
+                <div class="part-icon">🎯</div>
+                <div class="part-name">核心</div>
+            </div>
+        </div>
+        
+        <!-- 动作展示区 -->
+        <div class="exercises-section" id="exercisesSection">
+            <div class="section-title">推荐动作</div>
+            <div class="exercises-grid" id="exercisesGrid">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 健身动作数据库
+        const exercisesDB = {
+            chest: [
+                {
+                    name: '杠铃卧推',
+                    equipment: '杠铃 + 卧推架',
+                    gif: 'https://media.giphy.com/media/3oriNZoNvn73MZaFYk/giphy.gif',
+                    target: '胸大肌、三角肌前束、肱三头肌',
+                    steps: [
+                        '仰卧在卧推凳上，双脚踩实地面',
+                        '双手握住杠铃，握距略宽于肩',
+                        '下放杠铃至胸部中段，肘部呈45度角',
+                        '推起杠铃至手臂伸直，不要锁死肘关节'
+                    ],
+                    tips: [
+                        '保持肩胛骨收紧，不要耸肩',
+                        '下放时吸气，推起时呼气',
+                        '新手建议有人保护',
+                        '重量循序渐进，动作标准最重要'
+                    ]
+                },
+                {
+                    name: '哑铃飞鸟',
+                    equipment: '哑铃 + 平凳',
+                    gif: 'https://media.giphy.com/media/xT8qAZcty5f0BEm2lO/giphy.gif',
+                    target: '胸大肌',
+                    steps: [
+                        '仰卧在平凳上，双手持哑铃于胸前',
+                        '手臂微屈，向两侧下放哑铃',
+                        '感受胸肌拉伸，至与肩同高',
+                        '胸肌发力，弧线收回哑铃'
+                    ],
+                    tips: [
+                        '手臂保持微屈，不要完全伸直',
+                        '动作缓慢，感受肌肉拉伸',
+                        '重量不宜过大，注重拉伸感'
+                    ]
+                },
+                {
+                    name: '上斜哑铃推举',
+                    equipment: '哑铃 + 上斜凳',
+                    gif: 'https://media.giphy.com/media/3oriNZoNvn73MZaFYk/giphy.gif',
+                    target: '上胸、三角肌前束',
+                    steps: [
+                        '调整凳子角度至30-45度',
+                        '双手持哑铃坐于凳上',
+                        '下放哑铃至上胸位置',
+                        '推起至手臂伸直'
+                    ],
+                    tips: [
+                        '角度不要超过45度，否则肩部参与过多',
+                        '下放时肘部向后下方',
+                        '专注上胸发力'
+                    ]
+                }
+            ],
+            back: [
+                {
+                    name: '高位下拉',
+                    equipment: '高位下拉机',
+                    gif: 'https://media.giphy.com/media/xT8qBvH1pAhtfSx52U/giphy.gif',
+                    target: '背阔肌、大圆肌',
+                    steps: [
+                        '坐在器械上，大腿固定在挡板下',
+                        '双手宽握横杆，身体微后仰',
+                        '下拉横杆至上胸部',
+                        '缓慢还原，感受背肌拉伸'
+                    ],
+                    tips: [
+                        '不要耸肩，保持肩胛骨下沉',
+                        '下拉时呼气，还原时吸气',
+                        '专注背阔肌发力，不要用手臂拉'
+                    ]
+                },
+                {
+                    name: '坐姿划船',
+                    equipment: '坐姿划船机',
+                    gif: 'https://media.giphy.com/media/xT8qBvH1pAhtfSx52U/giphy.gif',
+                    target: '背阔肌、菱形肌、斜方肌',
+                    steps: [
+                        '坐在器械上，双脚踩稳踏板',
+                        '双手握住手柄，身体坐直',
+                        '向后拉动手柄至腹部',
+                        '夹紧肩胛骨，缓慢还原'
+                    ],
+                    tips: [
+                        '保持背部挺直，不要过度后仰',
+                        '向后拉时夹紧肩胛骨',
+                        '还原时保持张力，不要完全放松'
+                    ]
+                },
+                {
+                    name: '杠铃划船',
+                    equipment: '杠铃',
+                    gif: 'https://media.giphy.com/media/xT8qBvH1pAhtfSx52U/giphy.gif',
+                    target: '背阔肌、斜方肌、后束三角肌',
+                    steps: [
+                        '双脚与肩同宽，膝盖微屈',
+                        '俯身约45度，背部挺直',
+                        '双手握杠铃，向上拉至腹部',
+                        '缓慢下放，保持背部张力'
+                    ],
+                    tips: [
+                        '背部始终保持挺直',
+                        '不要借力晃动',
+                        '重量不宜过大，动作标准优先'
+                    ]
+                }
+            ],
+            legs: [
+                {
+                    name: '杠铃深蹲',
+                    equipment: '杠铃 + 深蹲架',
+                    gif: 'https://media.giphy.com/media/xT8qBvH1pAhtfSx52U/giphy.gif',
+                    target: '股四头肌、臀大肌、腘绳肌',
+                    steps: [
+                        '杠铃置于斜方肌上，双手握稳',
+                        '双脚与肩同宽，脚尖略向外',
+                        '下蹲至大腿与地面平行',
+                        '臀腿发力站起'
+                    ],
+                    tips: [
+                        '膝盖方向与脚尖一致',
+                        '下蹲时臀部后坐',
+                        '核心收紧，背部挺直',
+                        '新手建议先用空杆练习'
+                    ]
+                },
+                {
+                    name: '腿举',
+                    equipment: '腿举机',
+                    gif: 'https://media.giphy.com/media/xT8qBvH1pAhtfSx52U/giphy.gif',
+                    target: '股四头肌、臀大肌',
+                    steps: [
+                        '坐在器械上，背部紧贴靠背',
+                        '双脚踩在踏板上，与肩同宽',
+                        '下放踏板至膝盖呈90度',
+                        '推起踏板，不要锁死膝盖'
+                    ],
+                    tips: [
+                        '脚放得越高，臀部参与越多',
+                        '脚放得越低，股四头肌参与越多',
+                        '下放时吸气，推起时呼气'
+                    ]
+                },
+                {
+                    name: '罗马尼亚硬拉',
+                    equipment: '杠铃/哑铃',
+                    gif: 'https://media.giphy.com/media/xT8qBvH1pAhtfSx52U/giphy.gif',
+                    target: '腘绳肌、臀大肌',
+                    steps: [
+                        '双手持杠铃，双脚与髋同宽',
+                        '膝盖微屈，髋部后推',
+                        '杠铃沿腿前下放至膝盖下',
+                        '感受腘绳肌拉伸，臀部发力站起'
+                    ],
+                    tips: [
+                        '背部始终保持挺直',
+                        '动作缓慢，感受拉伸',
+                        '不要弯腰，用髋关节运动'
+                    ]
+                }
+            ],
+            shoulders: [
+                {
+                    name: '哑铃肩推',
+                    equipment: '哑铃',
+                    gif: 'https://media.giphy.com/media/xT8qBvH1pAhtfSx52U/giphy.gif',
+                    target: '三角肌前束、中束',
+                    steps: [
+                        '坐姿或站姿，双手持哑铃于肩侧',
+                        '向上推举至手臂伸直',
+                        '缓慢下放至起始位置'
+                    ],
+                    tips: [
+                        '不要耸肩，保持肩胛骨稳定',
+                        '推起时呼气，下放时吸气',
+                        '重量不宜过大，保护肩关节'
+                    ]
+                },
+                {
+                    name: '哑铃侧平举',
+                    equipment: '哑铃',
+                    gif: 'https://media.giphy.com/media/xT8qBvH1pAhtfSx52U/giphy.gif',
+                    target: '三角肌中束',
+                    steps: [
+                        '双手持哑铃，身体微前倾',
+                        '向两侧举起哑铃至肩高',
+                        '缓慢下放，保持张力'
+                    ],
+                    tips: [
+                        '小指略高于拇指',
+                        '不要耸肩，用肩部发力',
+                        '重量小一点，动作标准更重要'
+                    ]
+                },
+                {
+                    name: '面拉',
+                    equipment: '绳索 + 拉力器',
+                    gif: 'https://media.giphy.com/media/xT8qBvH1pAhtfSx52U/giphy.gif',
+                    target: '三角肌后束、菱形肌',
+                    steps: [
+                        '双手握住绳索，高度与肩同高',
+                        '向后拉动绳索至面部两侧',
+                        '夹紧肩胛骨，缓慢还原'
+                    ],
+                    tips: [
+                        '专注后束发力',
+                        '不要耸肩',
+                        '对改善圆肩驼背很有帮助'
+                    ]
+                }
+            ],
+            arms: [
+                {
+                    name: '杠铃弯举',
+                    equipment: '杠铃',
+                    gif: 'https://media.giphy.com/media/xT8qBvH1pAhtfSx52U/giphy.gif',
+                    target: '肱二头肌',
+                    steps: [
+                        '双手反握杠铃，与肩同宽',
+                        '上臂固定，向上弯举杠铃',
+                        '收缩肱二头肌，缓慢下放'
+                    ],
+                    tips: [
+                        '上臂保持固定，不要晃动',
+                        '不要借力甩动',
+                        '下放时保持张力'
+                    ]
+                },
+                {
+                    name: '绳索下压',
+                    equipment: '拉力器 + 绳索',
+                    gif: 'https://media.giphy.com/media/xT8qBvH1pAhtfSx52U/giphy.gif',
+                    target: '肱三头肌',
+                    steps: [
+                        '双手握住绳索，上臂贴紧身体',
+                        '向下拉动绳索至手臂伸直',
+                        '缓慢还原，保持张力'
+                    ],
+                    tips: [
+                        '上臂保持固定',
+                        '动作底部向外分开绳索',
+                        '专注肱三头肌收缩'
+                    ]
+                },
+                {
+                    name: '锤式弯举',
+                    equipment: '哑铃',
+                    gif: 'https://media.giphy.com/media/xT8qBvH1pAhtfSx52U/giphy.gif',
+                    target: '肱肌、肱桡肌',
+                    steps: [
+                        '双手持哑铃，掌心相对',
+                        '向上弯举哑铃',
+                        '缓慢下放'
+                    ],
+                    tips: [
+                        '掌心始终相对',
+                        '可以交替或同时进行',
+                        '对手臂线条很有帮助'
+                    ]
+                }
+            ],
+            core: [
+                {
+                    name: '卷腹',
+                    equipment: '瑜伽垫',
+                    gif: 'https://media.giphy.com/media/xT8qBvH1pAhtfSx52U/giphy.gif',
+                    target: '腹直肌',
+                    steps: [
+                        '仰卧，双膝弯曲，双脚踩地',
+                        '双手轻触耳侧或交叉胸前',
+                        '卷起上身，肩胛骨离地',
+                        '缓慢下放，不要完全躺平'
+                    ],
+                    tips: [
+                        '不要用手拉头',
+                        '专注腹部发力，不要用脖子',
+                        '动作缓慢，不要借力'
+                    ]
+                },
+                {
+                    name: '平板支撑',
+                    equipment: '瑜伽垫',
+                    gif: 'https://media.giphy.com/media/xT8qBvH1pAhtfSx52U/giphy.gif',
+                    target: '核心整体',
+                    steps: [
+                        '俯卧，前臂和脚尖支撑身体',
+                        '身体呈一条直线',
+                        '保持姿势，收紧核心',
+                        '不要塌腰或撅臀'
+                    ],
+                    tips: [
+                        '保持呼吸均匀',
+                        '核心始终收紧',
+                        '初学者可以从20秒开始'
+                    ]
+                },
+                {
+                    name: '俄罗斯转体',
+                    equipment: '哑铃/药球',
+                    gif: 'https://media.giphy.com/media/xT8qBvH1pAhtfSx52U/giphy.gif',
+                    target: '腹斜肌',
+                    steps: [
+                        '坐姿，双膝弯曲，身体后倾',
+                        '双手持重物于胸前',
+                        '左右转体，触地',
+                        '保持核心稳定'
+                    ],
+                    tips: [
+                        '双脚可以悬空增加难度',
+                        '转体时呼气',
+                        '动作缓慢，感受侧腹发力'
+                    ]
+                }
+            ]
+        };
+        
+        // DOM 元素
+        const partBtns = document.querySelectorAll('.part-btn');
+        const exercisesSection = document.getElementById('exercisesSection');
+        const exercisesGrid = document.getElementById('exercisesGrid');
+        
+        // 当前选中的部位
+        let currentPart = null;
+        
+        // 绑定部位按钮事件
+        partBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const part = btn.dataset.part;
+                
+                // 更新按钮状态
+                partBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // 如果点击同一个部位，隐藏展示区
+                if (currentPart === part) {
+                    exercisesSection.classList.remove('show');
+                    currentPart = null;
+                    btn.classList.remove('active');
+                    return;
+                }
+                
+                currentPart = part;
+                showExercises(part);
+            });
+        });
+        
+        // 显示动作
+        function showExercises(part) {
+            const exercises = exercisesDB[part];
+            
+            if (!exercises || exercises.length === 0) {
+                exercisesGrid.innerHTML = '<div class="loading"><p>暂无该部位的动作数据</p></div>';
+                exercisesSection.classList.add('show');
+                return;
+            }
+            
+            // 显示加载状态
+            exercisesGrid.innerHTML = '<div class="loading"><div class="loading-spinner"></div><p>加载动作数据...</p></div>';
+            exercisesSection.classList.add('show');
+            
+            // 模拟加载延迟
+            setTimeout(() => {
+                exercisesGrid.innerHTML = exercises.map(exercise => createExerciseCard(exercise)).join('');
+            }, 300);
+        }
+        
+        // 创建动作卡片
+        function createExerciseCard(exercise) {
+            return `
+                <div class="exercise-card">
+                    <div class="exercise-gif">
+                        <div class="placeholder">
+                            <div class="icon">🏋️‍♂️</div>
+                            <p>动作演示</p>
+                            <p style="font-size:12px;margin-top:5px">GIF 加载中...</p>
+                        </div>
+                    </div>
+                    <div class="exercise-info">
+                        <div class="exercise-name">${exercise.name}</div>
+                        <div class="exercise-equipment">器材：${exercise.equipment}</div>
+                        
+                        <div class="exercise-details">
+                            <div class="detail-item">
+                                <div class="detail-icon">🎯</div>
+                                <div class="detail-content">
+                                    <h4>目标肌群</h4>
+                                    <p>${exercise.target}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <div class="detail-icon">📝</div>
+                                <div class="detail-content">
+                                    <h4>动作步骤</h4>
+                                    <ol style="color:#a8b2d1;font-size:14px;line-height:1.8;padding-left:20px">
+                                        ${exercise.steps.map(step => `<li>${step}</li>`).join('')}
+                                    </ol>
+                                </div>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <div class="detail-icon">💡</div>
+                                <div class="detail-content">
+                                    <h4>注意事项</h4>
+                                    <ul class="tips-list">
+                                        ${exercise.tips.map(tip => `<li>${tip}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
